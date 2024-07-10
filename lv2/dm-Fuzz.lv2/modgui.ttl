@@ -1,0 +1,37 @@
+@prefix modgui: <http://moddevices.com/ns/modgui#> .
+@prefix lv2:    <http://lv2plug.in/ns/lv2core#> .
+
+<https://github.com/davemollen/dm-Fuzz>
+    modgui:gui [
+        modgui:resourcesDirectory <modgui> ;
+        modgui:iconTemplate <modgui/icon-dm-fuzz.html> ;
+        modgui:stylesheet <modgui/stylesheet-dm-fuzz.css> ;
+        modgui:screenshot <modgui/screenshot-dm-fuzz.png> ;
+        modgui:thumbnail <modgui/thumbnail-dm-fuzz.png> ;
+        modgui:brand "DM" ;
+        modgui:label "Fuzz" ;
+        modgui:model "lata" ;
+        modgui:panel "7-knobs" ;
+        modgui:color "white" ;
+        modgui:port [
+            lv2:index 0 ;
+            lv2:symbol "pre_filter" ;
+            lv2:name "Pre-filter" ;
+        ] , [
+            lv2:index 1 ;
+            lv2:symbol "gain" ;
+            lv2:name "Gain" ;
+        ] , [
+            lv2:index 2 ;
+            lv2:symbol "bias" ;
+            lv2:name "Bias" ;
+        ] , [
+            lv2:index 3 ;
+            lv2:symbol "tone" ;
+            lv2:name "Tone" ;
+        ] , [
+            lv2:index 4 ;
+            lv2:symbol "volume" ;
+            lv2:name "Volume" ;
+        ] ;
+    ] .

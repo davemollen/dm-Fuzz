@@ -5,3 +5,4 @@
     a lv2:Plugin ;
     lv2:binary <libdm_fuzz.so> ;
     rdfs:seeAlso <dm-Fuzz.ttl>  .
+<https://github.com/davemollen/dm-Fuzz> rdfs:seeAlso <modgui.ttl> .
