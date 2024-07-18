@@ -40,7 +40,7 @@ impl Plugin for DmFuzz {
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
     let pre_filter = Fuzz::map_filter_param(*ports.pre_filter);
-    let gain = *ports.gain * *ports.gain * *ports.gain * 2511.886432 + 1.;
+    let gain = *ports.gain * *ports.gain * 2511.886432 + 1.;
     let bias = *ports.bias;
     let tone = Fuzz::map_filter_param(*ports.tone + 0.5);
     let volume = *ports.volume;
