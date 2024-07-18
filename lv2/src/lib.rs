@@ -42,7 +42,7 @@ impl Plugin for DmFuzz {
     let pre_filter = Fuzz::map_filter_param(*ports.pre_filter);
     let gain = *ports.gain * *ports.gain * *ports.gain * 2511.886432 + 1.;
     let bias = *ports.bias;
-    let tone = Fuzz::map_filter_param(*ports.tone * 0.5);
+    let tone = Fuzz::map_filter_param(*ports.tone + 0.5);
     let volume = *ports.volume;
 
     if !self.is_active {

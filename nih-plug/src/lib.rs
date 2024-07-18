@@ -18,7 +18,7 @@ impl DmFuzz {
       Fuzz::map_filter_param(self.params.pre_filter.value()),
       gain * gain * 159. + 1.,
       self.params.bias.value(),
-      Fuzz::map_filter_param(self.params.tone.value()),
+      Fuzz::map_filter_param(self.params.tone.value() + 0.5),
       self.params.volume.value(),
     )
   }

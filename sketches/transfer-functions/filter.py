@@ -8,8 +8,7 @@ sample_rate = 44100  # in Hz
 # Change the filter value to see the difference in the frequency response
 # Keep it between 0 and 1
 filter = 0.5
-filter = 1. - filter
-filter = max(filter * filter * 0.175438596, 0.00001)
+filter = filter * filter * 0.175438596
 
 def get_s_domain_coefficients(t):
   # ( (1.-t)*R3 * C1 * t*R3 + (1.-t)*R3 * C1 * R2 ) * s + ( (1.-t)*R3 + t*R3 )
@@ -51,4 +50,5 @@ plt.xlabel('frequency [Hz]')
 plt.grid()
 plt.axis('tight')
 plt.xlim([10, 20000])
+plt.ylim([-20, 5])
 plt.show()

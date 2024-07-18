@@ -26,8 +26,7 @@ impl Fuzz {
   }
 
   pub fn map_filter_param(filter: f32) -> f32 {
-    let filter = 1. - filter;
-    (filter * filter * 0.175438596).max(0.000001)
+    filter * filter * 0.175438596
   }
 
   pub fn initialize_params(
