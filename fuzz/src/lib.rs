@@ -1,3 +1,4 @@
+#![feature(portable_simd)]
 mod clipper;
 mod filter;
 mod smooth_parameters;
