@@ -35,22 +35,22 @@ impl Default for FuzzParameters {
     Self {
       editor_state: editor::default_state(),
 
-      pre_filter: FloatParam::new("Pre-filter", 0.25, FloatRange::Linear { min: 0., max: 1. })
+      pre_filter: FloatParam::new("Pre-filter", 0.15, FloatRange::Linear { min: 0., max: 1. })
         .with_unit(" %")
         .with_value_to_string(v2s_f32_percentage(2))
         .with_string_to_value(s2v_f32_percentage()),
 
-      gain: FloatParam::new("Gain", 0.5, FloatRange::Linear { min: 0., max: 1. })
+      gain: FloatParam::new("Gain", 0.8, FloatRange::Linear { min: 0., max: 1. })
         .with_unit(" %")
         .with_value_to_string(v2s_f32_percentage(2))
         .with_string_to_value(s2v_f32_percentage()),
 
-      bias: FloatParam::new("Bias", 0.5, FloatRange::Linear { min: 0., max: 1. })
+      bias: FloatParam::new("Bias", 1.0, FloatRange::Linear { min: 0., max: 1. })
         .with_unit(" %")
         .with_value_to_string(v2s_f32_percentage(2))
         .with_string_to_value(s2v_f32_percentage()),
 
-      tone: FloatParam::new("Tone", 0.75, FloatRange::Linear { min: 0., max: 1. })
+      tone: FloatParam::new("Tone", 0.7, FloatRange::Linear { min: 0., max: 1. })
         .with_unit(" %")
         .with_value_to_string(v2s_f32_percentage(2))
         .with_string_to_value(s2v_f32_percentage()),
