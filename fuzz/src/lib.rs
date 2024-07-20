@@ -57,14 +57,17 @@ impl Fuzz {
       .process(pre_filter, gain, bias, tone, volume);
 
     let pre_filter_out = self.pre_filter.process(input, pre_filter);
-    let gain_and_bias_out = Self::apply_gain_and_bias(pre_filter_out, gain, bias);
-    let clipper_out = self.clipper.process(gain_and_bias_out);
-    let tone_out = self.tone.process(clipper_out, tone);
+    let clipper_out = self.clipper.process(pre_filter_out * gain);
+    let bias_out = Self::apply_bias(clipper_out, bias);
+    let tone_out = self.tone.process(bias_out, tone);
     tone_out * volume
   }
 
-  fn apply_gain_and_bias(input: f32, gain: f32, bias: f32) -> f32 {
-    let scaled_input = input * gain;
-    scaled_input + scaled_input.abs() * bias
+  fn apply_bias(input: f32, bias: f32) -> f32 {
+    if input < 0. {
+      input * (1. - bias)
+    } else {
+      input
+    }
   }
 }
