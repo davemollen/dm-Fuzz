@@ -40,7 +40,7 @@ impl Default for FuzzParameters {
         .with_value_to_string(v2s_f32_percentage(2))
         .with_string_to_value(s2v_f32_percentage()),
 
-      gain: FloatParam::new("Gain", 0.8, FloatRange::Linear { min: 0., max: 1. })
+      gain: FloatParam::new("Gain", 0.5, FloatRange::Linear { min: 0., max: 1. })
         .with_unit(" %")
         .with_value_to_string(v2s_f32_percentage(2))
         .with_string_to_value(s2v_f32_percentage()),
