@@ -24,7 +24,7 @@ impl Clipper {
       .upsample_fir
       .process(f32x8::splat(input * OVERSAMPLE_FACTOR));
     let clipped = Self::clip(upsampled);
-    self.downsample_fir.process(clipped).reduce_sum() * 0.25
+    self.downsample_fir.process(clipped).reduce_sum() * 0.5
   }
 
   fn clip(x: f32x8) -> f32x8 {

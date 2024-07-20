@@ -51,23 +51,33 @@ impl Fuzz {
     bias: f32,
     tone: f32,
     volume: f32,
+    style: i32,
   ) -> f32 {
     let (pre_filter, gain, bias, tone, volume) = self
       .smooth_parameters
       .process(pre_filter, gain, bias, tone, volume);
 
     let pre_filter_out = self.pre_filter.process(input, pre_filter);
-    let clipper_out = self.clipper.process(pre_filter_out * gain);
-    let bias_out = Self::apply_bias(clipper_out, bias);
-    let tone_out = self.tone.process(bias_out, tone);
+    let clipper_out = self.clip(pre_filter_out, gain, bias, style);
+    let tone_out = self.tone.process(clipper_out, tone);
     tone_out * volume
   }
 
-  fn apply_bias(input: f32, bias: f32) -> f32 {
-    if input < 0. {
-      input * (1. - bias)
-    } else {
-      input
+  fn clip(&mut self, input: f32, gain: f32, bias: f32, style: i32) -> f32 {
+    match style {
+      0 => {
+        let clipper_out = self.clipper.process(input * gain);
+        if clipper_out < 0. {
+          clipper_out * (1. - bias)
+        } else {
+          clipper_out
+        }
+      }
+      _ => {
+        let scaled_input = input * gain;
+        let clipper_input = scaled_input + scaled_input.abs() * bias;
+        self.clipper.process(clipper_input)
+      }
     }
   }
 }

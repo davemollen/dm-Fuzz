@@ -11,15 +11,17 @@ struct DmFuzz {
 }
 
 impl DmFuzz {
-  fn get_params(&self) -> (f32, f32, f32, f32, f32) {
+  fn get_params(&self) -> (f32, f32, f32, f32, f32, i32) {
     let gain = self.params.gain.value();
+    let volume = self.params.volume.value();
 
     (
       Fuzz::map_filter_param(self.params.pre_filter.value()),
-      gain * gain * 2511.886432 + 1.,
+      gain * gain * gain * 2511.886432 + 1.,
       self.params.bias.value(),
       Fuzz::map_filter_param(self.params.tone.value() + 0.5),
-      self.params.volume.value(),
+      volume * volume,
+      self.params.style.value(),
     )
   }
 }
@@ -70,7 +72,7 @@ impl Plugin for DmFuzz {
     _context: &mut impl InitContext<Self>,
   ) -> bool {
     self.fuzz = Fuzz::new(buffer_config.sample_rate);
-    let (pre_filter, gain, bias, tone, volume) = self.get_params();
+    let (pre_filter, gain, bias, tone, volume, _) = self.get_params();
     self
       .fuzz
       .initialize_params(pre_filter, gain, bias, tone, volume);
@@ -83,13 +85,13 @@ impl Plugin for DmFuzz {
     _aux: &mut AuxiliaryBuffers,
     _context: &mut impl ProcessContext<Self>,
   ) -> ProcessStatus {
-    let (pre_filter, gain, bias, tone, volume) = self.get_params();
+    let (pre_filter, gain, bias, tone, volume, style) = self.get_params();
 
     buffer.iter_samples().for_each(|mut channel_samples| {
       let sample = channel_samples.iter_mut().next().unwrap();
       *sample = self
         .fuzz
-        .process(*sample, pre_filter, gain, bias, tone, volume);
+        .process(*sample, pre_filter, gain, bias, tone, volume, style);
     });
     ProcessStatus::Normal
   }
