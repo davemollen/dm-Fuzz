@@ -12,15 +12,12 @@ struct DmFuzz {
 
 impl DmFuzz {
   fn get_params(&self) -> (f32, f32, f32, f32, f32, i32) {
-    let gain = self.params.gain.value();
-    let volume = self.params.volume.value();
-
-    (
-      Fuzz::map_filter_param(self.params.pre_filter.value()),
-      gain * gain * gain * 2511.886432 + 1.,
+    self.fuzz.map_params(
+      self.params.pre_filter.value(),
+      self.params.gain.value(),
       self.params.bias.value(),
-      Fuzz::map_filter_param(self.params.tone.value() + 0.5),
-      volume * volume,
+      self.params.tone.value(),
+      self.params.volume.value(),
       self.params.style.value(),
     )
   }

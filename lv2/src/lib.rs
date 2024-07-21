@@ -40,12 +40,14 @@ impl Plugin for DmFuzz {
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
-    let pre_filter = Fuzz::map_filter_param(*ports.pre_filter);
-    let gain = *ports.gain * *ports.gain * *ports.gain * 2511.886432 + 1.;
-    let bias = *ports.bias;
-    let tone = Fuzz::map_filter_param(*ports.tone + 0.5);
-    let volume = *ports.volume * *ports.volume;
-    let style = *ports.style as i32;
+    let (pre_filter, gain, bias, tone, volume, style) = self.fuzz.map_params(
+      *ports.pre_filter,
+      *ports.gain,
+      *ports.bias,
+      *ports.tone,
+      *ports.volume,
+      *ports.style as i32,
+    );
 
     if !self.is_active {
       self

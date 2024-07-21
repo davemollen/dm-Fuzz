@@ -26,8 +26,23 @@ impl Fuzz {
     }
   }
 
-  pub fn map_filter_param(filter: f32) -> f32 {
-    filter * filter * 0.175438596
+  pub fn map_params(
+    &self,
+    pre_filter: f32,
+    gain: f32,
+    bias: f32,
+    tone: f32,
+    volume: f32,
+    style: i32,
+  ) -> (f32, f32, f32, f32, f32, i32) {
+    (
+      Self::map_filter_param(pre_filter),
+      gain * gain * gain * 2511.886432 + 1.,
+      bias,
+      Self::map_filter_param(tone + 0.5),
+      volume * volume,
+      style,
+    )
   }
 
   pub fn initialize_params(
@@ -75,9 +90,14 @@ impl Fuzz {
       }
       _ => {
         let scaled_input = input * gain;
+        let bias = bias.powf(0.33333);
         let clipper_input = scaled_input + scaled_input.abs() * bias;
-        self.clipper.process(clipper_input)
+        self.clipper.process(clipper_input / 2_f32.powf(bias))
       }
     }
+  }
+
+  fn map_filter_param(filter: f32) -> f32 {
+    filter * filter * 0.175438596
   }
 }
