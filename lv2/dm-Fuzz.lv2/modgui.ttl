@@ -33,9 +33,5 @@
             lv2:index 4 ;
             lv2:symbol "volume" ;
             lv2:name "Volume" ;
-        ] , [
-            lv2:index 5 ;
-            lv2:symbol "style" ;
-            lv2:name "Style" ;
         ] ;
     ] .

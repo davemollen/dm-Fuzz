@@ -1,7 +1,6 @@
 use nih_plug::{
   formatters::{s2v_f32_percentage, v2s_f32_percentage},
-  params::IntParam,
-  prelude::{FloatParam, FloatRange, IntRange, Params},
+  prelude::{FloatParam, FloatRange, Params},
 };
 use nih_plug_vizia::ViziaState;
 use std::sync::Arc;
@@ -29,9 +28,6 @@ pub struct FuzzParameters {
 
   #[id = "volume"]
   pub volume: FloatParam,
-
-  #[id = "style"]
-  pub style: IntParam,
 }
 
 impl Default for FuzzParameters {
@@ -63,8 +59,6 @@ impl Default for FuzzParameters {
         .with_unit(" %")
         .with_value_to_string(v2s_f32_percentage(2))
         .with_string_to_value(s2v_f32_percentage()),
-
-      style: IntParam::new("Style", 0, IntRange::Linear { min: 0, max: 1 }),
     }
   }
 }

@@ -10,7 +10,6 @@ struct Ports {
   bias: InputPort<Control>,
   tone: InputPort<Control>,
   volume: InputPort<Control>,
-  style: InputPort<Control>,
   input: InputPort<Audio>,
   output: OutputPort<Audio>,
 }
@@ -40,13 +39,12 @@ impl Plugin for DmFuzz {
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
-    let (pre_filter, gain, bias, tone, volume, style) = self.fuzz.map_params(
+    let (pre_filter, gain, bias, tone, volume) = self.fuzz.map_params(
       *ports.pre_filter,
       *ports.gain,
       *ports.bias,
       *ports.tone,
       *ports.volume,
-      *ports.style as i32,
     );
 
     if !self.is_active {
@@ -59,7 +57,7 @@ impl Plugin for DmFuzz {
     for (input, output) in ports.input.iter().zip(ports.output.iter_mut()) {
       *output = self
         .fuzz
-        .process(*input, pre_filter, gain, bias, tone, volume, style);
+        .process(*input, pre_filter, gain, bias, tone, volume);
     }
   }
 }

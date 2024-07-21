@@ -61,23 +61,14 @@ A fuzz effect written in Rust.
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-	] , [
-		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 5 ;
-		lv2:symbol "style" ;
-		lv2:name "Style" ;
-		lv2:portProperty lv2:integer ;
-		lv2:default 0 ;
-		lv2:minimum 0 ;
-		lv2:maximum 1 ;
 	], [
 		a lv2:AudioPort, lv2:InputPort ;
-		lv2:index 6 ;
+		lv2:index 5 ;
 		lv2:symbol "input" ;
 		lv2:name "Input"
 	] , [
 		a lv2:AudioPort, lv2:OutputPort ;
-		lv2:index 7 ;
+		lv2:index 6 ;
 		lv2:symbol "output" ;
 		lv2:name "Output"
 	] .
