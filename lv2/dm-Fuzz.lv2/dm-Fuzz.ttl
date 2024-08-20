@@ -17,7 +17,7 @@
 	mod:brand "DM" ;
 	mod:label "Fuzz" ;
 	rdfs:comment """
-A fuzz effect written in Rust.
+A mono fuzz effect.
 """ ;
 	lv2:requiredFeature lv2:inPlaceBroken ;
 	lv2:optionalFeature lv2:hardRTCapable ;
