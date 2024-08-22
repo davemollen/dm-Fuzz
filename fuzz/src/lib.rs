@@ -35,10 +35,10 @@ impl Fuzz {
     volume: f32,
   ) -> (f32, f32, f32, f32, f32) {
     (
-      Self::map_filter_param(pre_filter),
+      pre_filter * pre_filter * 0.175438596,
       gain * gain * gain * 2511.886432 + 1.,
       bias,
-      Self::map_filter_param(tone + 0.5),
+      tone * tone * 0.325877192 + 0.025,
       volume * volume,
     )
   }
@@ -80,9 +80,5 @@ impl Fuzz {
     let clipper_input = scaled_input + scaled_input.abs() * bias;
     let gain_compensation = 1. - (bias * 0.5);
     self.clipper.process(clipper_input * gain_compensation)
-  }
-
-  fn map_filter_param(filter: f32) -> f32 {
-    filter * filter * 0.175438596
   }
 }
