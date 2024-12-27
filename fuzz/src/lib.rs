@@ -1,16 +1,14 @@
 #![feature(portable_simd)]
 mod clipper;
 mod filter;
-mod smooth_parameters;
+mod params;
 mod shared {
   pub mod float_ext;
 }
-use clipper::Clipper;
-use filter::Filter;
-use smooth_parameters::SmoothParameters;
+pub use params::Params;
+use {clipper::Clipper, filter::Filter, params::Smoother};
 
 pub struct Fuzz {
-  smooth_parameters: SmoothParameters,
   pre_filter: Filter,
   clipper: Clipper,
   tone: Filter,
@@ -19,55 +17,18 @@ pub struct Fuzz {
 impl Fuzz {
   pub fn new(sample_rate: f32) -> Self {
     Self {
-      smooth_parameters: SmoothParameters::new(sample_rate),
       pre_filter: Filter::new(sample_rate),
       clipper: Clipper::new(),
       tone: Filter::new(sample_rate),
     }
   }
 
-  pub fn map_params(
-    &self,
-    pre_filter: f32,
-    gain: f32,
-    bias: f32,
-    tone: f32,
-    volume: f32,
-  ) -> (f32, f32, f32, f32, f32) {
-    (
-      Self::map_filter_param(pre_filter),
-      gain * gain * gain * 2511.886432 + 1.,
-      bias,
-      Self::map_filter_param(tone + 0.5),
-      volume * volume,
-    )
-  }
-
-  pub fn initialize_params(
-    &mut self,
-    pre_filter: f32,
-    gain: f32,
-    bias: f32,
-    tone: f32,
-    volume: f32,
-  ) {
-    self
-      .smooth_parameters
-      .initialize(pre_filter, gain, bias, tone, volume);
-  }
-
-  pub fn process(
-    &mut self,
-    input: f32,
-    pre_filter: f32,
-    gain: f32,
-    bias: f32,
-    tone: f32,
-    volume: f32,
-  ) -> f32 {
-    let (pre_filter, gain, bias, tone, volume) = self
-      .smooth_parameters
-      .process(pre_filter, gain, bias, tone, volume);
+  pub fn process(&mut self, input: f32, params: &mut Params) -> f32 {
+    let pre_filter = params.pre_filter.next();
+    let gain = params.gain.next();
+    let bias = params.bias.next();
+    let tone = params.tone.next();
+    let volume = params.volume.next();
 
     let pre_filter_out = self.pre_filter.process(input, pre_filter);
     let clipper_out = self.clip(pre_filter_out, gain, bias);
@@ -80,9 +41,5 @@ impl Fuzz {
     let clipper_input = scaled_input + scaled_input.abs() * bias;
     let gain_compensation = 1. - (bias * 0.5);
     self.clipper.process(clipper_input * gain_compensation)
-  }
-
-  fn map_filter_param(filter: f32) -> f32 {
-    filter * filter * 0.175438596
   }
 }

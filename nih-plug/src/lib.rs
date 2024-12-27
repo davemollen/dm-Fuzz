@@ -1,4 +1,4 @@
-use fuzz::Fuzz;
+use fuzz::{Fuzz, Params as ProcessedParams};
 use nih_plug::prelude::*;
 use std::sync::Arc;
 mod fuzz_parameters;
@@ -8,18 +8,7 @@ mod editor;
 struct DmFuzz {
   params: Arc<FuzzParameters>,
   fuzz: Fuzz,
-}
-
-impl DmFuzz {
-  fn get_params(&self) -> (f32, f32, f32, f32, f32) {
-    self.fuzz.map_params(
-      self.params.pre_filter.value(),
-      self.params.gain.value(),
-      self.params.bias.value(),
-      self.params.tone.value(),
-      self.params.volume.value(),
-    )
-  }
+  processed_params: ProcessedParams,
 }
 
 impl Default for DmFuzz {
@@ -27,7 +16,8 @@ impl Default for DmFuzz {
     let params = Arc::new(FuzzParameters::default());
     Self {
       params: params.clone(),
-      fuzz: Fuzz::new(44100.),
+      fuzz: Fuzz::new(44100.0),
+      processed_params: ProcessedParams::new(44100.0),
     }
   }
 }
@@ -68,10 +58,7 @@ impl Plugin for DmFuzz {
     _context: &mut impl InitContext<Self>,
   ) -> bool {
     self.fuzz = Fuzz::new(buffer_config.sample_rate);
-    let (pre_filter, gain, bias, tone, volume) = self.get_params();
-    self
-      .fuzz
-      .initialize_params(pre_filter, gain, bias, tone, volume);
+    self.processed_params = ProcessedParams::new(buffer_config.sample_rate);
     true
   }
 
@@ -81,13 +68,17 @@ impl Plugin for DmFuzz {
     _aux: &mut AuxiliaryBuffers,
     _context: &mut impl ProcessContext<Self>,
   ) -> ProcessStatus {
-    let (pre_filter, gain, bias, tone, volume) = self.get_params();
+    self.processed_params.set(
+      self.params.pre_filter.value(),
+      self.params.gain.value(),
+      self.params.bias.value(),
+      self.params.tone.value(),
+      self.params.volume.value(),
+    );
 
     buffer.iter_samples().for_each(|mut channel_samples| {
       let sample = channel_samples.iter_mut().next().unwrap();
-      *sample = self
-        .fuzz
-        .process(*sample, pre_filter, gain, bias, tone, volume);
+      *sample = self.fuzz.process(*sample, &mut self.processed_params);
     });
     ProcessStatus::Normal
   }

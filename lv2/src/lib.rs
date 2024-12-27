@@ -1,6 +1,6 @@
 extern crate fuzz;
 extern crate lv2;
-use fuzz::Fuzz;
+use fuzz::{Fuzz, Params};
 use lv2::prelude::*;
 
 #[derive(PortCollection)]
@@ -17,7 +17,7 @@ struct Ports {
 #[uri("https://github.com/davemollen/dm-Fuzz")]
 struct DmFuzz {
   fuzz: Fuzz,
-  is_active: bool,
+  params: Params,
 }
 
 impl Plugin for DmFuzz {
@@ -30,16 +30,18 @@ impl Plugin for DmFuzz {
 
   // Create a new instance of the plugin; Trivial in this case.
   fn new(_plugin_info: &PluginInfo, _features: &mut ()) -> Option<Self> {
+    let sample_rate = _plugin_info.sample_rate() as f32;
+
     Some(Self {
-      fuzz: Fuzz::new(_plugin_info.sample_rate() as f32),
-      is_active: false,
+      fuzz: Fuzz::new(sample_rate),
+      params: Params::new(sample_rate),
     })
   }
 
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
-    let (pre_filter, gain, bias, tone, volume) = self.fuzz.map_params(
+    self.params.set(
       *ports.pre_filter,
       *ports.gain,
       *ports.bias,
@@ -47,17 +49,8 @@ impl Plugin for DmFuzz {
       *ports.volume,
     );
 
-    if !self.is_active {
-      self
-        .fuzz
-        .initialize_params(pre_filter, gain, bias, tone, volume);
-      self.is_active = true;
-    }
-
     for (input, output) in ports.input.iter().zip(ports.output.iter_mut()) {
-      *output = self
-        .fuzz
-        .process(*input, pre_filter, gain, bias, tone, volume);
+      *output = self.fuzz.process(*input, &mut self.params);
     }
   }
 }
