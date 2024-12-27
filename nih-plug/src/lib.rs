@@ -1,4 +1,4 @@
-use fuzz::{Fuzz, Params as ProcessedParams};
+use fuzz::{Fuzz, Params as ProcessParams};
 use nih_plug::prelude::*;
 use std::sync::Arc;
 mod fuzz_parameters;
@@ -8,7 +8,7 @@ mod editor;
 struct DmFuzz {
   params: Arc<FuzzParameters>,
   fuzz: Fuzz,
-  processed_params: ProcessedParams,
+  process_params: ProcessParams,
 }
 
 impl Default for DmFuzz {
@@ -17,7 +17,7 @@ impl Default for DmFuzz {
     Self {
       params: params.clone(),
       fuzz: Fuzz::new(44100.0),
-      processed_params: ProcessedParams::new(44100.0),
+      process_params: ProcessParams::new(44100.0),
     }
   }
 }
@@ -58,7 +58,7 @@ impl Plugin for DmFuzz {
     _context: &mut impl InitContext<Self>,
   ) -> bool {
     self.fuzz = Fuzz::new(buffer_config.sample_rate);
-    self.processed_params = ProcessedParams::new(buffer_config.sample_rate);
+    self.process_params = ProcessParams::new(buffer_config.sample_rate);
     true
   }
 
@@ -68,7 +68,7 @@ impl Plugin for DmFuzz {
     _aux: &mut AuxiliaryBuffers,
     _context: &mut impl ProcessContext<Self>,
   ) -> ProcessStatus {
-    self.processed_params.set(
+    self.process_params.set(
       self.params.pre_filter.value(),
       self.params.gain.value(),
       self.params.bias.value(),
@@ -78,7 +78,7 @@ impl Plugin for DmFuzz {
 
     buffer.iter_samples().for_each(|mut channel_samples| {
       let sample = channel_samples.iter_mut().next().unwrap();
-      *sample = self.fuzz.process(*sample, &mut self.processed_params);
+      *sample = self.fuzz.process(*sample, &mut self.process_params);
     });
     ProcessStatus::Normal
   }

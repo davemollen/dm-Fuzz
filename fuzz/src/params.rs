@@ -8,27 +8,41 @@ pub struct Params {
   pub bias: LinearSmooth,
   pub tone: LinearSmooth,
   pub volume: LinearSmooth,
+  is_initialized: bool,
 }
 
 impl Params {
   pub fn new(sample_rate: f32) -> Self {
     Self {
-      pre_filter: LinearSmooth::new(20.0, sample_rate),
-      gain: LinearSmooth::new(20.0, sample_rate),
-      bias: LinearSmooth::new(20.0, sample_rate),
-      tone: LinearSmooth::new(20.0, sample_rate),
-      volume: LinearSmooth::new(20.0, sample_rate),
+      pre_filter: LinearSmooth::new(sample_rate, 20.),
+      gain: LinearSmooth::new(sample_rate, 20.),
+      bias: LinearSmooth::new(sample_rate, 20.),
+      tone: LinearSmooth::new(sample_rate, 20.),
+      volume: LinearSmooth::new(sample_rate, 20.),
+      is_initialized: false,
     }
   }
 
   pub fn set(&mut self, pre_filter: f32, gain: f32, bias: f32, tone: f32, volume: f32) {
-    self
-      .pre_filter
-      .set_target(Self::map_filter_param(pre_filter));
-    self.gain.set_target(gain * gain * gain * 2511.886432 + 1.0);
-    self.bias.set_target(bias);
-    self.tone.set_target(Self::map_filter_param(tone + 0.5));
-    self.volume.set_target(volume * volume);
+    let pre_filter = Self::map_filter_param(pre_filter);
+    let gain = gain * gain * gain * 2511.886432 + 1.0;
+    let tone = Self::map_filter_param(tone + 0.5);
+    let volume = volume * volume;
+
+    if self.is_initialized {
+      self.pre_filter.set_target(pre_filter);
+      self.gain.set_target(gain);
+      self.bias.set_target(bias);
+      self.tone.set_target(tone);
+      self.volume.set_target(volume);
+    } else {
+      self.pre_filter.reset(pre_filter);
+      self.gain.reset(gain);
+      self.bias.reset(bias);
+      self.tone.reset(tone);
+      self.volume.reset(volume);
+      self.is_initialized = true;
+    }
   }
 
   fn map_filter_param(filter: f32) -> f32 {

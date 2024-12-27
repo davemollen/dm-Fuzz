@@ -29,8 +29,8 @@ impl Plugin for DmFuzz {
   type AudioFeatures = ();
 
   // Create a new instance of the plugin; Trivial in this case.
-  fn new(_plugin_info: &PluginInfo, _features: &mut ()) -> Option<Self> {
-    let sample_rate = _plugin_info.sample_rate() as f32;
+  fn new(plugin_info: &PluginInfo, _features: &mut ()) -> Option<Self> {
+    let sample_rate = plugin_info.sample_rate() as f32;
 
     Some(Self {
       fuzz: Fuzz::new(sample_rate),
