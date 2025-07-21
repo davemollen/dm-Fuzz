@@ -5,13 +5,13 @@ use lv2::prelude::*;
 
 #[derive(PortCollection)]
 struct Ports {
-  pre_filter: InputPort<Control>,
-  gain: InputPort<Control>,
-  bias: InputPort<Control>,
-  tone: InputPort<Control>,
-  volume: InputPort<Control>,
-  input: InputPort<Audio>,
-  output: OutputPort<Audio>,
+  pre_filter: InputPort<InPlaceControl>,
+  gain: InputPort<InPlaceControl>,
+  bias: InputPort<InPlaceControl>,
+  tone: InputPort<InPlaceControl>,
+  volume: InputPort<InPlaceControl>,
+  input: InputPort<InPlaceAudio>,
+  output: OutputPort<InPlaceAudio>,
 }
 
 #[uri("https://github.com/davemollen/dm-Fuzz")]
@@ -42,15 +42,16 @@ impl Plugin for DmFuzz {
   // iterates over.
   fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
     self.params.set(
-      *ports.pre_filter,
-      *ports.gain,
-      *ports.bias,
-      *ports.tone,
-      *ports.volume,
+      ports.pre_filter.get(),
+      ports.gain.get(),
+      ports.bias.get(),
+      ports.tone.get(),
+      ports.volume.get(),
     );
 
-    for (input, output) in ports.input.iter().zip(ports.output.iter_mut()) {
-      *output = self.fuzz.process(*input, &mut self.params);
+    for (input, output) in ports.input.iter().zip(ports.output.iter()) {
+      let fuzz_output = self.fuzz.process(input.get(), &mut self.params);
+      output.set(fuzz_output);
     }
   }
 }
