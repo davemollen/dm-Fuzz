@@ -23,7 +23,7 @@ impl Default for DmFuzz {
 }
 
 impl Plugin for DmFuzz {
-  const NAME: &'static str = "dm-Fuzz";
+  const NAME: &'static str = "Fuzz";
   const VENDOR: &'static str = "DM";
   const URL: &'static str = "https://github.com/davemollen/dm-Fuzz";
   const EMAIL: &'static str = "davemollen@gmail.com";
