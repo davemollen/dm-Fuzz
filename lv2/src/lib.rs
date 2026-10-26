@@ -1,6 +1,6 @@
 extern crate fuzz;
 extern crate lv2;
-use fuzz::{Fuzz, Params};
+use fuzz::{Bypass, Fuzz, Params};
 use lv2::prelude::*;
 
 #[derive(PortCollection)]
@@ -12,12 +12,14 @@ struct Ports {
   volume: InputPort<InPlaceControl>,
   input: InputPort<InPlaceAudio>,
   output: OutputPort<InPlaceAudio>,
+  enabled: InputPort<InPlaceControl>,
 }
 
 #[uri("https://github.com/davemollen/dm-Fuzz")]
 struct DmFuzz {
   fuzz: Fuzz,
   params: Params,
+  bypass: Bypass,
 }
 
 impl Plugin for DmFuzz {
@@ -35,6 +37,7 @@ impl Plugin for DmFuzz {
     Some(Self {
       fuzz: Fuzz::new(sample_rate),
       params: Params::new(sample_rate),
+      bypass: Bypass::new(sample_rate),
     })
   }
 
@@ -42,11 +45,22 @@ impl Plugin for DmFuzz {
   fn activate(&mut self, _features: &mut Self::InitFeatures) {
     self.fuzz.reset();
     self.params.reset();
+    self.bypass.reset();
   }
 
   // Process a chunk of audio. The audio ports are dereferenced to slices, which the plugin
   // iterates over.
-  fn run(&mut self, ports: &mut Ports, _features: &mut (), _sample_count: u32) {
+  fn run(&mut self, ports: &mut Ports, _features: &mut (), sample_count: u32) {
+    self.bypass.set_enabled(ports.enabled.get() == 0., || {
+      self.fuzz.reset();
+      self.params.reset();
+    });
+
+    if self.bypass.is_done_activating() {
+      ports.output.copy_from(&ports.input, sample_count);
+      return;
+    }
+
     self.params.set(
       ports.pre_filter.get(),
       ports.gain.get(),
@@ -56,7 +70,9 @@ impl Plugin for DmFuzz {
     );
 
     for (input, output) in ports.input.iter().zip(ports.output.iter()) {
-      let fuzz_output = self.fuzz.process(input.get(), &mut self.params);
+      let dry = input.get();
+      let wet = self.fuzz.process(dry, &mut self.params);
+      let fuzz_output = self.bypass.process(dry, wet);
       output.set(fuzz_output);
     }
   }

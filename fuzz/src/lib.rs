@@ -1,11 +1,12 @@
 #![feature(portable_simd)]
+mod bypass;
 mod clipper;
 mod filter;
 mod params;
 mod shared {
   pub mod float_ext;
 }
-pub use params::Params;
+pub use {bypass::Bypass, params::Params};
 use {clipper::Clipper, filter::Filter, params::Smoother};
 
 pub struct Fuzz {
