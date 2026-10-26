@@ -69,6 +69,11 @@ impl Plugin for DmFuzz {
     true
   }
 
+  fn reset(&mut self) {
+    self.fuzz.reset();
+    self.process_params.reset();
+  }
+
   fn process(
     &mut self,
     buffer: &mut Buffer,

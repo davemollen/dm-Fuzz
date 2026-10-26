@@ -23,6 +23,12 @@ impl Fuzz {
     }
   }
 
+  pub fn reset(&mut self) {
+    self.pre_filter.reset();
+    self.clipper.reset();
+    self.tone.reset();
+  }
+
   pub fn process(&mut self, input: f32, params: &mut Params) -> f32 {
     let pre_filter = params.pre_filter.next();
     let gain = params.gain.next();

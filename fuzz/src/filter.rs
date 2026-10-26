@@ -20,6 +20,10 @@ impl Filter {
     }
   }
 
+  pub fn reset(&mut self) {
+    self.z = 0.;
+  }
+
   pub fn process(&mut self, input: f32, tone: f32) -> f32 {
     let s_domain_coefficients = Self::get_s_domain_coefficients(tone);
     let z_domain_coefficients = self.bilinear_transform.process(s_domain_coefficients);

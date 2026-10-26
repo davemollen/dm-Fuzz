@@ -23,6 +23,10 @@ impl Params {
     }
   }
 
+  pub fn reset(&mut self) {
+    self.is_initialized = false;
+  }
+
   pub fn set(&mut self, pre_filter: f32, gain: f32, bias: f32, tone: f32, volume: f32) {
     let pre_filter = Self::map_filter_param(pre_filter);
     let gain = gain * gain * gain * 2511.886432 + 1.0;

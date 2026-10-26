@@ -1,10 +1,8 @@
 mod fir_filter;
 use {
   fir_filter::FirFilter,
-  std::simd::{f32x8, num::SimdFloat, StdFloat},
+  std::simd::{f32x8, StdFloat},
 };
-
-const OVERSAMPLE_FACTOR: f32 = 8.;
 
 pub struct Clipper {
   upsample_fir: FirFilter,
@@ -17,6 +15,11 @@ impl Clipper {
       upsample_fir: FirFilter::new(),
       downsample_fir: FirFilter::new(),
     }
+  }
+
+  pub fn reset(&mut self) {
+    self.upsample_fir.reset();
+    self.downsample_fir.reset();
   }
 
   pub fn process(&mut self, input: f32) -> f32 {
