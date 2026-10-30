@@ -8,15 +8,19 @@ const R3: f32 = 100000.;
 const C1: f32 = 2.2e-8;
 
 pub struct Filter {
-  bilinear_transform: BilinearTransform,
   z: f32,
+  bilinear_transform: BilinearTransform,
+  prev_tone: Option<f32>,
+  z_domain_coefficients: ([f32; 2], [f32; 2]),
 }
 
 impl Filter {
   pub fn new(sample_rate: f32) -> Self {
     Self {
-      bilinear_transform: BilinearTransform::new(sample_rate),
       z: 0.,
+      bilinear_transform: BilinearTransform::new(sample_rate),
+      prev_tone: None,
+      z_domain_coefficients: ([0.; 2], [0.; 2]),
     }
   }
 
@@ -25,9 +29,12 @@ impl Filter {
   }
 
   pub fn process(&mut self, input: f32, tone: f32) -> f32 {
-    let s_domain_coefficients = Self::get_s_domain_coefficients(tone);
-    let z_domain_coefficients = self.bilinear_transform.process(s_domain_coefficients);
-    self.apply_filter(input, z_domain_coefficients)
+    if self.prev_tone.map_or(true, |value| value != tone) {
+      let s_domain_coefficients = Self::get_s_domain_coefficients(tone);
+      self.z_domain_coefficients = self.bilinear_transform.process(s_domain_coefficients);
+      self.prev_tone = Some(tone);
+    }
+    self.apply_filter(input, self.z_domain_coefficients)
   }
 
   fn get_s_domain_coefficients(tone: f32) -> ([f32; 2], [f32; 2]) {
